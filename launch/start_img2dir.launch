@@ -1,0 +1,13 @@
+<!-- Starts img2dir node on local computer --> 
+<launch>
+
+    <!-- start a dedicated img2dir node on the local computer -->
+    <node pkg="srrc_img2dir" type="srrc_img2dir_node" name="srrc_img2dir_left" output="screen">
+        <param name="input_image_topic_name" value="/turret_stereo/left/image" />
+        <param name="input_image_transfer_hint" value="compressed" />
+        <param name="output_image_topic_name" value="cam_left_clustered_image" />
+        <param name="output_direction_topic_name" value="cam_left_target_dir" />
+        <rosparam file="$(find srrc_img2dir)/config/wide_cam_params.yaml" command="load" />
+    </node>
+</launch>
+

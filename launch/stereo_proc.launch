@@ -1,0 +1,16 @@
+<!-- prepares and calls stereo_image_proc with appropriate params -->
+<launch>
+  <include file="$(find srrc_img2dir)/launch/stereo_uncompress.launch" />
+  
+  <group ns="turret_stereo" >
+    <node name="turret_stereo_image_proc"
+      type="stereo_image_proc"
+      pkg="stereo_image_proc"
+      args="_approximate_sync:=True _queue_size:=100"
+      output="screen"
+      respawn="true"
+    />
+  </group>
+
+</launch>
+

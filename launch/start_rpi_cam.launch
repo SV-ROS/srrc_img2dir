@@ -1,0 +1,29 @@
+<!-- Starts from local comp a raspicam node on a raspbery pi board --> 
+<launch>
+    <arg name="address_byte" default="101" />
+    <arg name="machine_name" default="rpi_$(arg address_byte)" />
+    <arg name="rpi_cam_node_name" default="cam_left" />
+
+    <!-- arg name="image_topic_name" default="/$(arg machine_name)/image_raw/compressed" />
+    <arg name="caminfo_topic_name" default="/$(arg machine_name)/camera_info" / -->
+
+    <group>
+        <machine name="$(arg machine_name)"
+           address="192.168.0.101"
+           user="ubuntu"
+           password="ubuntu"
+           default="true"
+        />
+
+        <!-- start the raspicam service and image publisher on the raspi board -->
+        <!-- a basic camera- node -->
+        <node pkg="raspicam" type="raspicam_node" name="cam_left" >
+            <!-- <param name="camera" value="$(find raspicam)/calibrations/camera.yaml"/> -->
+            <remap from="camera/image/compressed" to="cam_left/image/compressed"/>
+            <remap from="camera/camera_info" to="cam_left/camera_info"/>
+            <remap from="camera/start_capture" to="cam_left/start_capture"/>
+            <remap from="camera/stop_capture" to="cam_left/stop_capture"/>
+        </node>
+    </group>
+
+</launch>

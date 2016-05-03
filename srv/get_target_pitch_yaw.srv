@@ -1,0 +1,8 @@
+# get target pitch&yaw:
+bool scan                   # scan for target using a predefined grid of camera py's, otherwise search for target in current camera pose
+bool center                 # center camera at target if found, otherwie leave the camera pose same
+bool publish_clustered_img  # publish clustered image(s) during search for target
+---
+bool    valid               # true if got target, otherwise pitch and yaw must be ignored
+float64 pitch               # found target pitch (in rads) wrt camera base frame
+float64 yaw                 # found camera yaw (in rads) wrt camera base frame

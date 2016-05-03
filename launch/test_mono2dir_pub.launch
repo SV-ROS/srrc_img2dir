@@ -1,0 +1,21 @@
+<!-- Starts test_image_pub and mono2dir nodes on local computer --> 
+<launch>
+  <!-- <include file="$(find srrc_img2dir)/launch/mono2dir.launch" /> -->
+    <!-- start a dedicated mono2dir node on the local computer -->
+    <node pkg="srrc_img2dir" type="srrc_mono2dir_node" name="srrc_mono2dir_left" output="screen">
+        <param name="input_image_topic" value="/turret_stereo/left/image" />
+        <param name="input_image_transfer_hint" value="raw" />
+        <param name="camera_use_camera_info" value="0" />
+        <rosparam file="$(find srrc_img2dir)/config/mono_cam_params.yaml" command="load" />
+    </node>
+
+    <!-- start a test_image_pub node on the local computer -->
+    <node pkg="srrc_img2dir" type="srrc_test_image_pub_node" name="srrc_test_image_pub" output="screen">
+        <!-- - -> <param name="result_topic" value="/cluster_status_image" /> <!- - --> 
+        <!-- --> <param name="result_topic" value="/sample_color_image" /> <!-- -->
+        <param name="src_image_file" value="/home/dd/Downloads/frame0066.jpg" />
+        <param name="output_folder" value="/home/dd/img2dir_results" />
+        <param name="src_topic" value="/turret_stereo/left/image" />
+    </node>
+</launch>
+

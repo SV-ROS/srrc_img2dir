@@ -1,0 +1,26 @@
+# parameter values used for wide-view raspberry pi camera
+
+camera_hight_in_m:                     1.21  # camera elevation above the ground.
+                                             # it's used for objects size estimation and is crucial for result
+
+min_obj_size_in_m:                     0.04  # minimal size of a visible part of an interesting object
+max_obj_size_in_m:                     0.18  # maximal size of an interesting object with admitting poor accuracy of our estimation of its size
+max_distance_in_m:                     8.00  # maximal distance to the object we think we are able to handle
+
+clusterizer_color_distance_threshold:  20.0  # distance threshold in approximate Lab color space to distinguish colors
+                                             # the less is the value the more segmented is the clustered image.
+                                             # the more the value the more consolidated blobs it finds.
+                                             # reasonable values are between 20 (for indoor or twilght)
+                                             #    and 160 (good light, contrast picture)
+
+clusterizer_black_threshold:           180   # Min L1-rgb-norm of "not black" point
+                                             # tells how dark can be the interesting object
+                                             # the less is the value the more risky is the color comparison
+                                             # the greater is the value the more chances to ignore an interesting shadowed object
+
+border_margin:                           4   # number of pixels telling how close the interesting object can be close to the frame's boundary (we assume we scan with overlap)
+max_num_of_threads:                      3   # number of background threads for scanning processing
+max_num_of_candidates:                   3   # maximum number of good object candidates to keep after scanning
+
+visualizer_method:                       2   # 0: don't update picture, 1: use sample pixel to color clusters, 2: by filter filtered the object out
+

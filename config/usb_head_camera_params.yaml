@@ -1,0 +1,15 @@
+# parameter values used for webcam
+
+camera_use_camera_info:               false  # if true will subscribe to sensor_msgs::CameraInfo otherwise will subscribe only to sensor_msgs::Image
+
+clusterizer_half_window_size:         2     # half of the sliding window size used for searching neighbor pixels 
+clusterizer_color_distance_threshold: 60.0  # distance threshold in approximate Lab color space to distinguish colors
+clusterizer_black_threshold:          72    # Min L1-rgb-norm of "not black" point
+
+best_cluster_min_num_of_pixels:       40   # search for candidate clusters that have not less then this number of pixels
+                                            # helps to avoid selecting too small objects such as spikes or distant features
+best_cluster_max_box_size:            100   # search for candidate clusters such that both width and height of its bbox is less then this value
+                                            # helps to avoid selecting huge objects such as sky, poles, walls etc
+
+visualizer_method:                    1     # 0: don't update picture, 1: use sample pixel to color clusters
+

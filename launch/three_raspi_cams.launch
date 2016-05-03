@@ -1,0 +1,78 @@
+<!-- Starts from local computer raspicam and arbitix servers on a raspbery pi boards and starts an associated three_raspi_cams node on local computer --> 
+<launch>
+
+<!-- fixme -->
+<arg name="machine_name" default="lalala" />
+
+    <!-- start the wide raspicam service on a raspi board -->
+    <!-- include file="$(find srrc_img2dir)/launch/start_rpi_cam.launch">
+      <arg name="address_byte" value="60" />
+      <arg name="machine_name" value="rpi_wide" />
+    </include>
+
+    <include file="$(find srrc_img2dir)/launch/start_rpi_cam.launch">
+      <arg name="address_byte" value="60" />
+      <arg name="machine_name" value="rpi_wide" />
+    </include -->
+
+    <arg name="wide_cam_machine" default="rpi_wide" />
+    <arg name="middle_cam_machine" default="rpi_middle" />
+    <arg name="narrow_cam_machine" default="rpi_narrow" />
+    <arg name="arbotix_machine" default="rpi_arbotix" />
+
+    <arg name="image_topic_name" default="/$(arg machine_name)/image_raw/compressed" />
+    <arg name="caminfo_topic_name" default="/$(arg machine_name)/camera_info" />
+
+    <machine name="$(arg wide_cam_machine)"
+       address="192.168.0.60"
+       user="ubuntu"
+       password="ubuntu"
+       default="false"
+    />
+
+    <machine name="$(arg middle_cam_machine)"
+       address="192.168.0.61"
+       user="ubuntu"
+       password="ubuntu"
+       default="false"
+    />
+
+    <machine name="$(arg narrow_cam_machine)"
+       address="192.168.0.62"
+       user="ubuntu"
+       password="ubuntu"
+       default="false"
+    />
+
+    <!-- node pkg="rosservice" type="rosservice" name="call_start_capture" args="call - -wait /$(arg wide_cam_machine)/camera/start_capture"/ -->
+    
+    <!-- start srrc_cam_pitch_yaw_srv node on the local computer -->
+    <node pkg="srrc_cam_pitch_yaw_srv" type="srrc_cam_pitch_yaw_srv" name="srrc_cam_pitch_yaw_srv" />
+
+    <!-- start a dedicated img2dir node on the local computer -->
+    <node pkg="srrc_img2dir" type="srrc_three_raspicams_node" name="srrc_three_raspicams" output="screen">
+        <rosparam file="$(find srrc_img2dir)/config/wide_cam_params.yaml" command="load" />
+    </node>
+
+<!--
+  <group ns="three_raspi_cams">
+    <include file="$(find srrc_img2dir)/launch/start_raspicam_and_img2dir.launch">
+      <arg name="machine_name" value="wide_cam" />
+      <arg name="address_byte" value="60" />
+    </include>
+
+    <include file="$(find srrc_img2dir)/launch/start_raspicam_and_img2dir.launch">
+      <arg name="machine_name" value="middle_cam" />
+      <arg name="address_byte" value="61" />
+    </include>
+
+    <include file="$(find srrc_img2dir)/launch/start_raspicam_and_img2dir.launch">
+      <arg name="machine_name" value="tele_cam" />
+      <arg name="address_byte" value="62" />
+    </include>
+
+  </group>
+-->
+
+</launch>
+

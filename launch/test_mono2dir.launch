@@ -1,0 +1,20 @@
+<!-- Starts test_image_pub and mono2dir nodes on local computer --> 
+<launch>
+    <!-- start a test_image_node node on the local computer -->
+    <node pkg="srrc_img2dir" type="srrc_test_image_node" name="srrc_test_image_process_node" output="screen">
+        <rosparam file="$(find srrc_img2dir)/config/mono_cam_params.yaml" command="load" />
+        <!-- -->
+	  <param name="src_image_src_folder" value="/home/dd/img2dir_sources/20160417_sunspots-right" />
+	  <param name="src_image_file" value="" />
+	<!-- -->
+	
+        <!-- - ->
+	  <param name="src_image_file" value="/home/dd/img2dir_sources/frame0066.jpg" />
+	<!- - -->
+        <!-- - ->
+	  <param name="src_image_file" value="/home/dd/img2dir_sources/frame0077.jpg" />
+	<!- - -->
+        <param name="output_folder" value="/home/dd/img2dir_results/20160417_sunspots-right" />
+    </node>
+</launch>
+

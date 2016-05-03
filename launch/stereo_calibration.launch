@@ -1,0 +1,14 @@
+<!-- streo calibration -->
+<launch>
+  <include file="$(find srrc_img2dir)/launch/stereo_uncompress.launch" />
+  
+  <node name="cameracalibrator"
+    type="cameracalibrator.py"
+    pkg="camera_calibration"
+    args="--size 8x6 --square 0.035 right:=/turret_stereo/right/image_raw left:=/turret_stereo/left/image_raw right_camera:=/turret_stereo/right left_camera:=/turret_stereo/left --approximate=100000"
+    output="screen"
+    respawn="true"
+  />
+
+</launch>
+

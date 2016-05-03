@@ -1,0 +1,46 @@
+<!-- Starts from local computer raspicam image publisher and server on a raspbery pi board and starts an associated img2dir node on local computer --> 
+<launch>
+
+    <arg name="address_byte" default="10" />
+    <arg name="machine_name" default="raspicam_$(arg address_byte)" />
+
+    <arg name="image_topic_name" default="/$(arg machine_name)/image_raw/compressed" />
+    <arg name="caminfo_topic_name" default="/$(arg machine_name)/camera_info" />
+
+    <machine name="$(arg machine_name)"
+       address="192.168.0.$(arg address_byte)"
+       user="ubuntu"
+       password="ubuntu"
+       env-loader="/home/ubuntu/catkin_ws/src/nasa_srrc/srrc_img2dir/config/env_$(arg address_byte).sh"
+       default="false"
+    />
+
+    <!-- start the raspicam service and image publisher on the raspi board -->
+    <node machine="$(arg machine_name)" name="$(arg machine_name)" pkg="raspicam" type="raspicam_node" respawn="true" output="screen">
+        <remap from="/$(arg machine_name)/camera/image/compressed" to="$(arg image_topic_name)" />
+        <remap from="/$(arg machine_name)/camera/camera_info" to="$(arg caminfo_topic_name)" />
+        <param name="camera_info_url" value="package://srrc_vision/config/camera_calibration/rpi_narrow.yaml" /> <!-- fixme: name of camera calibration file? -->
+        <param name="camera_name" value="$(arg machine_name)_camera" />
+        <param name="camera_frame_id" value="$(arg machine_name)_optical_frame" />
+	<param name="framerate" value="5" />
+        <!--
+           values for the srrc_publishing_mode parameter:
+           SrrcPublish_Always = 0, //: publish images always when the camera is on (default)
+           SrrcPublish_Wait   = 1, //: wait for request to publish only one image and then remain in this waiting mode
+           SrrcPublish_Once   = 2  //: publish one image and then switch in this waiting mode
+        -->
+	<param name="srrc_publishing_mode" value="0" />
+    </node>
+
+    <node pkg="rosservice" type="rosservice" name="call_start_capture" args="call --wait /$(arg machine_name)/camera/start_capture"/>
+    
+    <!-- start a dedicated img2dir node on the local computer -->
+    <node pkg="srrc_img2dir" type="srrc_img2dir_node" name="srrc_img2dir_$(arg machine_name)" output="screen">
+        <param name="input_image_topic_name" value="$(arg machine_name)_camera/image_raw" />
+        <param name="input_image_transfer_hint" value="compressed" />
+        <param name="output_image_topic_name" value="$(arg machine_name)_clustered_image" />
+        <param name="output_direction_topic_name" value="$(arg machine_name)_target_dir" />
+        <rosparam file="$(find srrc_img2dir)/config/wide_cam_params.yaml" command="load" />
+    </node>
+</launch>
+

@@ -1,0 +1,21 @@
+# parameter values used for clusterizing mono images
+
+clusterizer_color_distance_threshold:  20.0  # distance threshold in approximate Lab color space to distinguish colors
+                                             # the less is the value the more segmented is the clustered image.
+                                             # the more the value the more consolidated blobs it finds.
+                                             # reasonable values are between 20 (for indoor or twilght)
+                                             #    and 160 (good light, contrast picture)
+
+clusterizer_black_threshold:            80   # Min L1-rgb-norm of "not black" point
+                                             # tells how dark can be the interesting object
+                                             # the less is the value the more risky is the color comparison
+                                             # the greater is the value the more chances to ignore an interesting shadowed object
+                                             
+cluster_max_box_size:                   300  # length of max allowed size of a candidate cluster 2d bounding box
+
+cluster_min_num_of_pixels:              130  # min num of pixels in a candidate cluster
+
+border_margin:                           4   # number of pixels telling how close the interesting object can be close to the frame's boundary (we assume we scan with overlap)
+
+shape_ratio:                            3.0  # max allowed value of area(bbox(cluster)) / numOfPoints(cluster)
+

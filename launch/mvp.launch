@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find srrc_img2dir)/launch/three_raspi_cams.launch" />
+    <include file="$(find srrc_img2dir)/launch/webcam.launch" />
+</launch>
+

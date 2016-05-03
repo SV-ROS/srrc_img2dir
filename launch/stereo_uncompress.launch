@@ -1,0 +1,29 @@
+<!-- republish uncompressed streo images -->
+<launch>
+  <node name="republish_right"
+    type="republish"
+    pkg="image_transport"
+    args="compressed in:=/turret_stereo/right/image raw out:=/turret_stereo/right/image_raw"
+    output="screen"
+    respawn="true"
+  />
+
+  <node name="republish_left"
+    type="republish"
+    pkg="image_transport"
+    args="compressed in:=/turret_stereo/left/image raw out:=/turret_stereo/left/image_raw"
+    output="screen"
+    respawn="true"
+  />
+
+<!--
+  <node name="republish_left_depth"
+    type="republish"
+    pkg="image_transport"
+    args="compressedDepth in:=/turret_stereo/left/image_color raw out:=/turret_stereo/left/image_color/rawDepth"
+    output="screen"
+    respawn="true"
+  />
+-->
+</launch>
+

@@ -1,0 +1,13 @@
+<launch>
+
+  <include file="$(find realsense_camera)/launch/realsense_camera.launch" />
+  
+  <node pkg="srrc_img2dir" type="srrc_img2dir_node" name="srrc_img2dir_rs" output="screen">
+    <remap from="image" to="/camera/image/rgb_raw" />
+  	<rosparam file="$(find srrc_img2dir)/config/realsense_params.yaml" command="load" />
+  </node>
+
+  <node name="srrc_img2dir_rqt_graph" pkg="rqt_graph" type="rqt_graph" />
+  <node name="srrc_img2dir_rqt" pkg="rqt_image_view" type="rqt_image_view" />
+</launch>
+

@@ -1,0 +1,20 @@
+<launch>
+
+    <arg name="camera_ns" default="usb_head_camera"/>
+    <arg name="device" default="/dev/video1"/>
+
+    <include file="$(find srrc_vision)/launch/logitech720p_driver.launch">
+        <arg name="device" value="$(arg device)" />
+    </include>
+
+    <node pkg="srrc_img2dir" type="srrc_img2dir_node" name="srrc_img2dir_$(arg camera_ns)" output="screen">
+        <param name="input_image_topic_name" value="$(arg camera_ns)/image_raw" />
+        <param name="input_image_transfer_hint" value="raw" />
+        <param name="output_image_topic_name" value="$(arg camera_ns)_custered_image" />
+        <param name="output_direction_topic_name" value="$(arg camera_ns)_target_dir" />
+  	<rosparam file="$(find srrc_img2dir)/config/webcam_params.yaml" command="load" />
+    </node>
+
+    <!-- node name="srrc_img2dir_rqt" pkg="rqt_image_view" type="rqt_image_view" / -->
+</launch>
+

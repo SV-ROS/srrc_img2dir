@@ -1,0 +1,23 @@
+<!-- Starts from a local computer arbotix node on a raspbery pi board and starts an associated cam_pitch_yaw_srv node on a local computer --> 
+<launch>
+    <arg name="address_byte" default="62" />
+    <arg name="machine_name" default="rpi_$(arg address_byte)" />
+
+    <!-- machine name="$(arg machine_name)"
+       address="192.168.0.$(arg address_byte)"
+       user="ubuntu"
+       password="ubuntu"
+       default="false"
+    / -->
+
+    <!-- node machine="$(arg machine_name)" name="arbotix" pkg="arbotix_python" type="arbotix_driver" clear_params="true" output="screen">
+      <rosparam file="$(find srrc_bringup)/config/max/head_camera_dynamixels.yaml" command="load" />
+      <param name="sim" value="false" />
+    </node -->
+  
+    <node name="arbotix" pkg="arbotix_python" type="arbotix_driver" clear_params="true" output="screen">
+      <rosparam file="$(find srrc_bringup)/config/max/head_camera_dynamixels.yaml" command="load" />
+      <param name="sim" value="false" />
+    </node>
+
+</launch>

@@ -1,0 +1,15 @@
+<!-- Starts camera and img2dir node on a raspberry pi board -->
+<launch>
+
+  <arg name="camera_ns" default="usb_head_camera"/>
+  
+  <include file="$(find srrc_vision)/launch/rpi_narrow_driver_raspicam.launch">
+    <arg name="camera_ns" value="$(arg camera_ns)" />
+  </include>
+  
+  <node pkg="srrc_img2dir" type="srrc_img2dir_node" name="srrc_img2dir_raspicam_60" output="screen">
+    <remap from="image" to="$(arg camera_ns)/image_raw" />
+  	<rosparam file="$(find srrc_img2dir)/config/$(arg camera_ns)_params.yaml" command="load" />
+  </node>
+</launch>
+

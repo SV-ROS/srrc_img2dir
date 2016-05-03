@@ -1,0 +1,11 @@
+<!-- Starts mono2dir node on local computer --> 
+<launch>
+
+    <!-- start a dedicated mono2dir node on the local computer -->
+    <node pkg="srrc_img2dir" type="srrc_mono2dir_node" name="srrc_mono2dir_left" output="screen">
+        <param name="input_image_topic" value="/turret_stereo/left/image" />
+        <param name="input_image_transfer_hint" value="compressed" />
+        <rosparam file="$(find srrc_img2dir)/config/mono_cam_params.yaml" command="load" />
+    </node>
+</launch>
+
