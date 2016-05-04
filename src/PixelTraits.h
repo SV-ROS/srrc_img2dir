@@ -25,6 +25,17 @@ namespace pixel_traits {
 
     static const int c_BlackThreshold = 100;
 
+    struct ImagePreprocessParams {
+        bool use_preprocess_;
+        int saturation_threshold_;
+        int brightness_threshold_;
+
+        ImagePreprocessParams(int saturation_threshold = 168, int brightness_threshold = 40)
+            : use_preprocess_(true), saturation_threshold_(saturation_threshold), brightness_threshold_(brightness_threshold) {}
+        ImagePreprocessParams(bool use_preprocess, int saturation_threshold = 168, int brightness_threshold = 40)
+            : use_preprocess_(use_preprocess), saturation_threshold_(saturation_threshold), brightness_threshold_(brightness_threshold) {}
+    };
+
     struct ColorClustersParams {
         int halfWindowSize;
         double colorDistanceThreshold;
@@ -44,6 +55,17 @@ namespace pixel_traits {
             , shape_ratio(3)
         {
         }
+    };
+
+    typedef cv::SimpleBlobDetector::Params BwClustersParams;
+
+    struct ImageProcessParams {
+        bool use_simple_blob_detector_;
+        ImagePreprocessParams preprocess_params_;
+        ColorClustersParams color_cluster_params_;
+        BwClustersParams bw_cluster_params_;
+
+        ImageProcessParams() : use_simple_blob_detector_(true) {}
     };
 
     struct StereoClustersParams {

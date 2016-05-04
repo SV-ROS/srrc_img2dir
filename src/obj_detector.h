@@ -171,28 +171,34 @@ namespace obj_detector {
             cvInitFont(&font_, CV_FONT_HERSHEY_SIMPLEX, 0.5, 0.5);
         }
 
-        cv::Mat preprocessImage(cv::Mat& src_bgr_image) const {
+        static cv::Mat preprocessImage(cv::Mat& src_bgr_image, int saturation_threshold, int brightness_threshold) {
             cv::Mat res_image = src_bgr_image.clone();
-            int rows = res_image.size().height;
-            int cols = res_image.size().width;
             cv::cvtColor(res_image, res_image, cv::COLOR_BGR2HSV);
-            for(int row = 0; row < rows; ++row) {
-                for(int col = 0; col < cols; ++col) {
-                    cv::Vec3b hsv = res_image.at<cv::Vec3b>(row, col);
-                    hsv[1] = (hsv[1] >= 168) ? 255 : 0;
-                    hsv[2] = (hsv[2] >= 40) ? 255 : 0;
-                    res_image.at<cv::Vec3b>(row, col) = hsv;
-                }
-            }
-            cv::cvtColor(res_image, res_image, cv::COLOR_HSV2BGR);
+            std::vector<cv::Mat> hsv_channels;
+            cv::split(res_image, hsv_channels);
+            hsv_channels[1] = (hsv_channels[1] >= saturation_threshold);
+            hsv_channels[2] = (hsv_channels[2] >= brightness_threshold);
+            cv::merge(hsv_channels, res_image);
+//            int rows = res_image.size().height;
+//            int cols = res_image.size().width;
 //            for(int row = 0; row < rows; ++row) {
 //                for(int col = 0; col < cols; ++col) {
-//                    cv::Vec3b bgr = res_image.at<cv::Vec3b>(row, col);
-//                    bgr[1] = 0;
-//                    res_image.at<cv::Vec3b>(row, col) = bgr;
+//                    cv::Vec3b hsv = res_image.at<cv::Vec3b>(row, col);
+//                    hsv[1] = (hsv[1] >= saturation_threshold) ? 255 : 0;
+//                    hsv[2] = (hsv[2] >= brightness_threshold) ? 255 : 0;
+//                    res_image.at<cv::Vec3b>(row, col) = hsv;
 //                }
 //            }
+            cv::cvtColor(res_image, res_image, cv::COLOR_HSV2BGR);
             return res_image;
+        }
+
+        static cv::Mat preprocessToSimpleBwImage(cv::Mat& src_bgr_image, int saturation_threshold, int brightness_threshold) {
+            cv::Mat hsv_image = src_bgr_image.clone();
+            cv::cvtColor(hsv_image, hsv_image, cv::COLOR_BGR2HSV);
+            std::vector<cv::Mat> hsv_channels;
+            cv::split(hsv_image, hsv_channels);
+            return (hsv_channels[1] >= saturation_threshold) & (hsv_channels[2] >= brightness_threshold);
         }
 
         void drawInfoText(cv::Mat& result_bgr_image, std::string const& text) const {

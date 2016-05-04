@@ -32,30 +32,32 @@ namespace img2dir {
         }
 
         bool processMonoImage(sensor_msgs::Image const& image_msg) {
-            ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg)");
+            TRACE_TO_ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg)");
             got_cam_model_ = false;
             try {
               original_image_ = cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8);
-              ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg)-1");
+              TRACE_TO_ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg)-1");
             }
             catch (...){
               ROS_ERROR("[draw_frames] Failed to convert image");
               return false;
             }
 
-            preprocessed_image_ = colorizer_.preprocessImage(original_image_->image);
-            clusterizer_.clusterizeAndPp(preprocessed_image_, params_);
-            ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg)-done.");
+            preprocessed_image_ = colorizer_.preprocessImage(original_image_->image
+                                                             , params_.preprocess_params_.saturation_threshold_
+                                                             , params_.preprocess_params_.brightness_threshold_);
+            clusterizer_.clusterizeAndPp(preprocessed_image_, params_.color_cluster_params_);
+            TRACE_TO_ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg)-done.");
             return true;
         }
 
         bool processMonoImage(const sensor_msgs::ImageConstPtr& image_msg, const sensor_msgs::CameraInfoConstPtr& info_msg) {
             if(!processMonoImage(*image_msg))
                 return false;
-            ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg, info_msg)-0");
+            TRACE_TO_ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg, info_msg)-0");
             got_cam_model_ = true;
             mono_cam_model_.fromCameraInfo(info_msg);
-            //ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg, info_msg)-1");
+            //TRACE_TO_ROS_INFO("TRACE(FrameProcessor): entered into processMonoImage(image_msg, info_msg)-1");
 
     //        clustering::ClusterIndex best_cluster_index = clusterizer_.getBestClusterIndex();
     //        obj_detector::ImageClusterizer::Cluster const* best_cluster
@@ -82,7 +84,7 @@ namespace img2dir {
     //            text = "direction: n/a";
     //        }
     //        //colorizer_.drawInfoText(input_bridge->image, text);
-    //        ROS_INFO("%s", text.c_str());
+    //        TRACE_TO_ROS_INFO("%s", text.c_str());
             return true;
         }
 
@@ -178,7 +180,8 @@ namespace img2dir {
             return strstr.str();
         }
 
-        pixel_traits::ColorClustersParams params_;
+        pixel_traits::ImageProcessParams params_;
+
         obj_detector::ImageClusterizer clusterizer_;
         obj_detector::Colorizer colorizer_;
 
@@ -217,17 +220,17 @@ namespace img2dir {
       }
 
       void monoImageCb(const sensor_msgs::ImageConstPtr& image_msg, const sensor_msgs::CameraInfoConstPtr& info_msg) {
-        //ROS_INFO("TRACE: entered into Mono2dirNodeBase::monoImageCb(image_msg, info_msg)");
+        //TRACE_TO_ROS_INFO("TRACE: entered into Mono2dirNodeBase::monoImageCb(image_msg, info_msg)");
         //updateParams();
         if(!getFrameProcessor().processMonoImage(image_msg, info_msg)) {
-            //ROS_INFO("TRACE: exitting Mono2dirNodeBase::monoImageCb(image_msg, info_msg) due to failure.");
+            //TRACE_TO_ROS_INFO("TRACE: exitting Mono2dirNodeBase::monoImageCb(image_msg, info_msg) due to failure.");
             return;
         }
 
 //        std::string verbose_text_info = getFrameProcessor().generateVerboseSummary();
-//        ROS_INFO("TRACE(Mono2dirNodeBase): all clusters summary: %s", verbose_text_info.c_str());
+//        TRACE_TO_ROS_INFO("TRACE(Mono2dirNodeBase): all clusters summary: %s", verbose_text_info.c_str());
         std::string text_info = getFrameProcessor().generateTextSummary();
-        ROS_INFO("TRACE(Mono2dirNodeBase): candidates summary: %s", text_info.c_str());
+        TRACE_TO_ROS_INFO("TRACE(Mono2dirNodeBase): candidates summary: %s", text_info.c_str());
         getFrameProcessor().publishImageColoredBySampleColor(sample_color_image_pub_);
         getFrameProcessor().publishImageColoredByClusterStatus(cluster_status_image_pub_);
         //fixme: publish direction to target
@@ -238,18 +241,18 @@ namespace img2dir {
       }
 
       void processImage(const sensor_msgs::Image& image_msg) {
-          ROS_INFO("TRACE(Mono2dirNodeBase): entered into Mono2dirNodeBase::processImage(image_msg)");
+          TRACE_TO_ROS_INFO("TRACE(Mono2dirNodeBase): entered into Mono2dirNodeBase::processImage(image_msg)");
           //updateParams();
           if(!getFrameProcessor().processMonoImage(image_msg))
               return;
 
           std::string verbose_text_info = getFrameProcessor().generateVerboseSummary();
-          ROS_INFO("TRACE(Mono2dirNodeBase): all clusters summary: %s", verbose_text_info.c_str());
+          TRACE_TO_ROS_INFO("TRACE(Mono2dirNodeBase): all clusters summary: %s", verbose_text_info.c_str());
           std::string text_info = getFrameProcessor().generateTextSummary();
-          ROS_INFO("TRACE(Mono2dirNodeBase): candidates summary: %s", text_info.c_str());
+          TRACE_TO_ROS_INFO("TRACE(Mono2dirNodeBase): candidates summary: %s", text_info.c_str());
           getFrameProcessor().publishImageColoredBySampleColor(sample_color_image_pub_);
           getFrameProcessor().publishImageColoredByClusterStatus(cluster_status_image_pub_);
-          ROS_INFO("TRACE(Mono2dirNodeBase): entered into Mono2dirNodeBase::processImage(image_msg) - done.");
+          TRACE_TO_ROS_INFO("TRACE(Mono2dirNodeBase): entered into Mono2dirNodeBase::processImage(image_msg) - done.");
       }
 
       template<typename t_Param>
@@ -263,7 +266,14 @@ namespace img2dir {
       }
 
       void updateParams() {
-        pixel_traits::ColorClustersParams& params = getFrameProcessor().params_;
+        updateParams(getFrameProcessor().params_.color_cluster_params_);
+      }
+
+      void printParams() {
+        printParams(getFrameProcessor().params_.color_cluster_params_);
+      }
+
+      void updateParams(pixel_traits::ColorClustersParams& params) {
         updateParam("clusterizer_color_distance_threshold", params.colorDistanceThreshold);
         updateParam("clusterizer_black_threshold",          params.black_threshold);
         updateParam("clusterizer_half_window_size",         params.halfWindowSize);
@@ -273,9 +283,8 @@ namespace img2dir {
         updateParam("shape_ratio",                          params.shape_ratio);
       }
 
-      void printParams() {
-        pixel_traits::ColorClustersParams& params = getFrameProcessor().params_;
-        ROS_INFO("Starting Mono/Stereo2dir node with parameters:");
+      void printParams(pixel_traits::ColorClustersParams& params) {
+        ROS_INFO("ColorClustersParams:");
         printParam("clusterizer_color_distance_threshold", params.colorDistanceThreshold);
         printParam("clusterizer_black_threshold",          params.black_threshold);
         printParam("clusterizer_half_window_size",         params.halfWindowSize);
@@ -284,6 +293,7 @@ namespace img2dir {
         printParam("border_margin",                        params.border_margin);
         printParam("shape_ratio",                          params.shape_ratio);
       }
+
     };
 
 }

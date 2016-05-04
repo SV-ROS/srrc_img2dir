@@ -6,6 +6,16 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Vector3.h>
 
+inline void doNothing(...) {}
+
+//#define USE_TRACE_TO_ROS_INFO
+#ifdef USE_TRACE_TO_ROS_INFO
+#define TRACE_TO_ROS_INFO ROS_INFO
+#else
+#define TRACE_TO_ROS_INFO doNothing
+#endif
+
+
 namespace img2dir {
 
 struct Nh {

@@ -40,7 +40,7 @@ public:
     }
 
     void publishImage(std::string const& image_file_name) {
-        ROS_INFO("TRACE(test_image_pub): publishing image %s", image_file_name.c_str());
+        TRACE_TO_ROS_INFO("TRACE(test_image_pub): publishing image %s", image_file_name.c_str());
         if(!boost::filesystem::exists(image_file_name)) {
             ROS_ERROR("ERROR(test_image_pub): file %s does not exist.", image_file_name.c_str());
             return;
@@ -48,18 +48,18 @@ public:
         src_image_.image = cv::imread(image_file_name, CV_LOAD_IMAGE_COLOR);
 //        cv::imshow("original image", src_image_.image);
 //        cv::waitKey();
-//        ROS_INFO("TRACE(test_image_pub): entered into publishImage(image_msg)-1");
+//        TRACE_TO_ROS_INFO("TRACE(test_image_pub): entered into publishImage(image_msg)-1");
         src_image_.encoding = "bgr8";
         sensor_msgs::Image ros_image;
         src_image_.toImageMsg(ros_image);
         last_published_image_file_name_ = boost::filesystem::path(image_file_name).filename().string();
         image_pub_.publish(ros_image);
-        ROS_INFO("TRACE(test_image_pub): publishing image %s - done.", image_file_name.c_str());
+        TRACE_TO_ROS_INFO("TRACE(test_image_pub): publishing image %s - done.", image_file_name.c_str());
     }
 
 private:
     void resultImageCb(const sensor_msgs::ImageConstPtr& image_msg) {
-        ROS_INFO("TRACE(test_image_pub): got result image for %s", last_published_image_file_name_.c_str());
+        TRACE_TO_ROS_INFO("TRACE(test_image_pub): got result image for %s", last_published_image_file_name_.c_str());
         //: assumes the mono2dir node publishes only images obtained from processing images published by this node and nobody else publish to the source and result topics!
         cv_bridge::CvImagePtr result_image;
         try {
@@ -78,9 +78,9 @@ private:
         if(!output_folder_.empty() && !last_published_image_file_name_.empty()) {
             boost::filesystem::path image_output_path = output_folder_ / last_published_image_file_name_;
             cv::imwrite(image_output_path.string(), stitch);
-            ROS_INFO("TRACE(test_image_pub): saved output image %s", image_output_path.c_str());
+            TRACE_TO_ROS_INFO("TRACE(test_image_pub): saved output image %s", image_output_path.c_str());
         }
-        ROS_INFO("TRACE(test_image_pub): got result image for %s - done.", last_published_image_file_name_.c_str());
+        TRACE_TO_ROS_INFO("TRACE(test_image_pub): got result image for %s - done.", last_published_image_file_name_.c_str());
         cv::imshow("clustered image", stitch);
         cv::waitKey();
         publishNextImage();
@@ -108,13 +108,13 @@ private:
                 ROS_WARN("TRACE(test_image_pub): Could not copy file %s. Reason: %s", params_file_name.c_str(), err_msg.c_str());
             }
         }
-        ROS_INFO("TRACE(test_image_pub): see for output images in %s", output_folder_.c_str());
+        TRACE_TO_ROS_INFO("TRACE(test_image_pub): see for output images in %s", output_folder_.c_str());
     }
 
     void publishNextImage(bool first = false) {
         boost::filesystem::directory_iterator end_itr;
         if(input_image_itr_ == end_itr) {
-            ROS_INFO("TRACE(test_image_pub): Done with publishing images.");
+            TRACE_TO_ROS_INFO("TRACE(test_image_pub): Done with publishing images.");
             return;
         }
         if(!first)
@@ -126,7 +126,7 @@ private:
               )
             ++input_image_itr_;
         if(input_image_itr_ == end_itr) {
-            ROS_INFO("TRACE(test_image_pub): Done with publishing images.");
+            TRACE_TO_ROS_INFO("TRACE(test_image_pub): Done with publishing images.");
             return;
         }
         publishImage(input_image_itr_->path().string());

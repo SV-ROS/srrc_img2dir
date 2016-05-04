@@ -22,7 +22,7 @@ class TestImageProcessor : public Mono2dirNodeBase {
 public:
   typedef Mono2dirNodeBase Base;
 
-  TestImageProcessor(Nh& nh) : Base(nh) {
+  TestImageProcessor(Nh& nh) : Base(nh), show_images_(false) {
     updateParams();
     printParams();
 
@@ -34,18 +34,18 @@ public:
   }
 
   void processImagesFromFolder(std::string const& image_folder_path) {
-      ROS_INFO("TRACE(test_image_process): processing folder %s", image_folder_path.c_str());
+      TRACE_TO_ROS_INFO("TRACE(test_image_process): processing folder %s", image_folder_path.c_str());
       boost::filesystem::directory_iterator end_itr;
       boost::filesystem::directory_iterator input_image_itr = findNextImage(boost::filesystem::directory_iterator(image_folder_path));
       while(input_image_itr != end_itr) {
           processImage(input_image_itr->path().string());
-          findNextImage(++input_image_itr);
+          input_image_itr = findNextImage(++input_image_itr);
       }
-      ROS_INFO("TRACE(test_image_process): Done with processing images.");
+      TRACE_TO_ROS_INFO("TRACE(test_image_process): Done with processing images.");
   }
 
   void processImage(std::string const& image_file_name) {
-      ROS_INFO("TRACE(test_image_process): processing image %s", image_file_name.c_str());
+      TRACE_TO_ROS_INFO("TRACE(test_image_process): processing image %s", image_file_name.c_str());
       if(!boost::filesystem::exists(image_file_name)) {
           ROS_ERROR("ERROR(test_image_process): file %s does not exist.", image_file_name.c_str());
           return;
@@ -53,18 +53,18 @@ public:
       src_image_.image = cv::imread(image_file_name, CV_LOAD_IMAGE_COLOR);
 //        cv::imshow("original image", src_image_.image);
 //        cv::waitKey();
-//        ROS_INFO("TRACE(test_image_process): entered into processImage(image_msg)-1");
+//        TRACE_TO_ROS_INFO("TRACE(test_image_process): entered into processImage(image_msg)-1");
       src_image_.encoding = "bgr8";
       sensor_msgs::Image ros_image;
       src_image_.toImageMsg(ros_image);
       Base::processImage(ros_image);
       makeResultImage(image_file_name);
-      ROS_INFO("TRACE(test_image_process): processing image %s - done.", image_file_name.c_str());
+      TRACE_TO_ROS_INFO("TRACE(test_image_process): processing image %s - done.", image_file_name.c_str());
   }
 
 private:
   void makeResultImage(std::string const& image_file_name) {
-      ROS_INFO("TRACE(test_image_process): in makeResultImage(%s)", image_file_name.c_str());
+      TRACE_TO_ROS_INFO("TRACE(test_image_process): in makeResultImage(%s)", image_file_name.c_str());
       int rows = src_image_.image.size().height;
       int cols = src_image_.image.size().width;
       cv::Mat stitch = cv::Mat(2 * rows + 2, 2 * cols + 2, CV_8UC3, cv::Scalar(0));
@@ -99,11 +99,13 @@ private:
       if(!output_folder_.empty()) {
           boost::filesystem::path image_output_path = output_folder_ / boost::filesystem::path(image_file_name).filename();
           cv::imwrite(image_output_path.string(), stitch);
-          ROS_INFO("TRACE(test_image_process): saved output image %s", image_output_path.c_str());
+          TRACE_TO_ROS_INFO("TRACE(test_image_process): saved output image %s", image_output_path.c_str());
       }
-      ROS_INFO("TRACE(test_image_process): in makeResultImage(%s) - done.", image_file_name.c_str());
-//      cv::imshow("clustered image", stitch);
-//      cv::waitKey();
+      TRACE_TO_ROS_INFO("TRACE(test_image_process): in makeResultImage(%s) - done.", image_file_name.c_str());
+      if(show_images_) {
+        cv::imshow("clustered image", stitch);
+        cv::waitKey();
+      }
   }
 
 private:
@@ -128,7 +130,7 @@ private:
               ROS_WARN("TRACE(test_image_pub): Could not copy file %s. Reason: %s", params_file_name.c_str(), err_msg.c_str());
           }
       }
-      ROS_INFO("TRACE(test_image_pub): see for output images in %s", output_folder_.c_str());
+      TRACE_TO_ROS_INFO("TRACE(test_image_pub): see for output images in %s", output_folder_.c_str());
   }
 
   boost::filesystem::directory_iterator findNextImage(boost::filesystem::directory_iterator input_image_itr) {
@@ -143,6 +145,7 @@ private:
   }
 
 private:
+  bool show_images_;
   boost::filesystem::path output_folder_;
   cv_bridge::CvImage src_image_;
 };
